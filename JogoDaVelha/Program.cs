@@ -1,223 +1,349 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace teste
+namespace JogoDaVelhaFinal
 {
     class Program
     {
         static void Main(string[] args)
         {
             string[,] matriz = new string[3, 3];
-            int vencedor = 0;
-            for (int i = 0, valor = 1; i < 3; i++)
+            int[,] mapa = new int[3, 3];
+            string jogador1 = null, jogador2 = null;
+            string dalt, resp;
+
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("\t\t\t++++++++++++++++ JOGO DA VELHA ++++++++++++++++\n\n");
+            Console.ResetColor();
+
+            Console.Write("Olá jogadores, desejam ligar o recurso de acessibilidade para daltônicos?[S/N]: ");
+            while (true)
             {
-                for (int j = 0; j < 3; j++)
+                try
                 {
-                    matriz[i, j] = Convert.ToString(valor);
-                    valor++;
+                    dalt = Console.ReadLine();
+                    dalt = dalt.ToUpper();
+                    if (dalt == "S" || dalt == "N") break;
+                    Console.WriteLine("POR FAVOR DIGITE [S] PARA SIM OU [N] PARA NÃO!!");
+                    Console.Write("Digite novamente: ");
+                    continue;
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("POR FAVOR DIGITE [S] PARA SIM OU [N] PARA NÃO!!");
+                    Console.Write("Digite novamente: ");
+                    continue;
                 }
             }
-            imprimir_jogo(matriz);
-            Console.WriteLine("\nDigite o nome do/a jogador(a) 1: ");
-            string jogador1 = Console.ReadLine();
-            Console.WriteLine("\nDigite o nome do/a jogador(a) 2: ");
-            string jogador2 = Console.ReadLine();
-            jogada(matriz, jogador1, jogador2, ref vencedor);
-            vencedor = verificaStatus(matriz);
-            Console.BackgroundColor = ConsoleColor.Blue;
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            if (vencedor == 1) Console.WriteLine("Jogador(a) 1: " + jogador1 + " é o/a Vencedor(a)");
-            else if (vencedor == 2) Console.WriteLine("Jogador(a) 2: " + jogador2 + " é o/a Vencedor(a)");
-            else Console.WriteLine("Deu velha...nenhum vencedor");
+
+            do
+            {
+                Console.WriteLine();
+                nomeJogador(ref jogador1, ref jogador2);
+                Console.WriteLine();
+
+                mapaMatriz(mapa);
+                Console.WriteLine("\n");
+
+                posicao(matriz, jogador1, jogador2, dalt);
+
+                Console.Write("\nDESEJA JOGAR NOVAMENTE??[S/N]: ");
+                while (true)
+                {
+                    try
+                    {
+                        resp = Console.ReadLine();
+                        resp = resp.ToUpper();
+                        if (resp == "S" || resp == "N") break;
+                        Console.WriteLine("POR FAVOR DIGITE [S] PARA SIM OU [N] PARA NÃO!!");
+                        Console.Write("Digite novamente: ");
+                        continue;
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("POR FAVOR DIGITE [S] PARA SIM OU [N] PARA NÃO!!");
+                        Console.Write("Digite novamente: ");
+                        continue;
+                    }
+                }
+                Array.Clear(matriz, 0, matriz.Length);
+            } while (resp == "S");
+
             Console.ReadKey();
         }
-        static void imprimir_jogo(string[,] matriz)
+        static void nomeJogador(ref string jogador1, ref string jogador2)
         {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("\n     <<<--Super Jogo da Velha-->>>\n");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("           Fernando e Eric\n\n");
-            Console.ResetColor();
-            Console.WriteLine("    Escolha um numero para sua jogada\n    Para confirmar sua jogada aperte ENTER\n    OBS:");
-            Console.WriteLine("    O número a ser digitado para a jogada deve ser inteiro e de 1 até 9!");
-            for (int i = 2; i >= 0; i--)
-            {
-                Console.WriteLine("\t+===================+");
-                for (int j = 0; j < 3; j++)
-                {
-                    Console.Write("\t| ");
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write(matriz[i, j]);
-                    Console.ResetColor();
-                    Console.Write(" | ");
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine("\t+===================+");
+            Console.Write("Digite o nome do primeiro Jogador: ");
+            jogador1 = Console.ReadLine();
+            Console.Write("Digite o nome do segundo Jogador: ");
+            jogador2 = Console.ReadLine();
         }
-        static void jogada(string[,] matriz, string jogador1, string jogador2, ref int vencedor)
+        static void Imprimir_Jogo(string[,] matriz, string dalt)
         {
-            bool verifica = false;
-            string label;
-            int jogada = 0;
-            for (int i = 1; i <= 9; i++)
+            if (dalt == "N")
             {
-                verifica = false;
-                if (i % 2 == 1)
+                for (int i = 0; i < matriz.GetLength(0); i++)
                 {
-                    do
+                    for (int c = 0; c < matriz.GetLength(1); c++)
                     {
-                        try
+                        pad(4);
+                        if (matriz[i, c] == "X")
                         {
-                            Console.WriteLine("\nVez do " + jogador1 + "!!!\n");
-                            jogada = int.Parse(Console.ReadLine());
-                            label = "X";
-                            verificaPosicao(matriz, jogada, label, ref verifica);
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.Write(matriz[i, c]);
+                            Console.ResetColor();
                         }
-                        catch (Exception)
+                        else
                         {
-                            Console.WriteLine("Por favor, digite um valor inteiro de 1 até 9 para a sua jogada!");
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write(matriz[i, c]);
+                            Console.ResetColor();
+                        }
+                        if (c != matriz.GetLength(1) - 1)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+                            Console.Write("\t|");
+                            Console.ResetColor();
                         }
                     }
-                    while ((jogada < 1) || (jogada > 9) || (verifica == false));
-                    imprimir_jogo(matriz);
-                }
-                else
-                {
-                    do
+                    if (i != matriz.GetLength(0) - 1)
                     {
-                        try
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        trace(26);
+                        Console.ResetColor();
+                        Console.WriteLine();
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < matriz.GetLength(0); i++)
+                {
+                    for (int c = 0; c < matriz.GetLength(1); c++)
+                    {
+                        pad(4);
+                        if (matriz[i, c] == "X")
                         {
-                            Console.WriteLine("\nVez do " + jogador2 + "!!!\n");
-                            jogada = int.Parse(Console.ReadLine());
-                            label = "O";
-                            verificaPosicao(matriz, jogada, label, ref verifica);
+                            Console.ForegroundColor = ConsoleColor.DarkBlue;
+                            Console.Write(matriz[i, c]);
+                            Console.ResetColor();
                         }
-                        catch (Exception)
+                        else
                         {
-                            Console.WriteLine("Por favor, digite um valor inteiro de 1 até 9 para sua jogada!");
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.Write(matriz[i, c]);
+                            Console.ResetColor();
+                        }
+                        if (c != matriz.GetLength(1) - 1)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+                            Console.Write("\t|");
+                            Console.ResetColor();
                         }
                     }
-                    while ((jogada < 1) || (jogada > 9) || (verifica == false));
-                    imprimir_jogo(matriz);
-                }
-                vencedor = verificaStatus(matriz);
-                if ((vencedor == 1) || (vencedor == 2)) i = 10;
-            }
-        }
-        static void verificaPosicao(string[,] matriz, int jogada, string label, ref Boolean verifica)
-        {
-            if ((jogada <= 3) && (jogada >= 1))
-            {
-                if ((jogada == 1) && (matriz[0, 0] != "X") && (matriz[0, 0] != "O"))
-                {
-                    verifica = true;
-                    matriz[0, 0] = label;
-                }
-                if ((jogada == 2) && (matriz[0, 1] != "X") && (matriz[0, 1] != "O"))
-                {
-                    verifica = true;
-                    matriz[0, 1] = label;
-                }
-                if ((jogada == 3) && (matriz[0, 2] != "X") && (matriz[0, 2] != "O"))
-                {
-                    verifica = true;
-                    matriz[0, 2] = label;
-                }
-            }
-            if ((jogada <= 6) && (jogada >= 4))
-            {
-                if ((jogada == 4) && (matriz[1, 0] != "X") && (matriz[1, 0] != "O"))
-                {
-                    verifica = true;
-                    matriz[1, 0] = label;
-                }
-                if ((jogada == 5) && (matriz[1, 1] != "X") && (matriz[1, 1] != "O"))
-                {
-                    verifica = true;
-                    matriz[1, 1] = label;
-                }
-                if ((jogada == 6) && (matriz[1, 2] != "X") && (matriz[1, 2] != "O"))
-                {
-                    verifica = true;
-                    matriz[1, 2] = label;
-                }
-            }
-            if ((jogada <= 9) && (jogada >= 7))
-            {
-                if ((jogada == 7) && (matriz[2, 0] != "X") && (matriz[2, 0] != "O"))
-                {
-                    verifica = true;
-                    matriz[2, 0] = label;
-                }
-                if ((jogada == 8) && (matriz[2, 1] != "X") && (matriz[2, 1] != "O"))
-                {
-                    verifica = true;
-                    matriz[2, 1] = label;
-                }
-                if ((jogada == 9) && (matriz[2, 2] != "X") && (matriz[2, 2] != "O"))
-                {
-                    verifica = true;
-                    matriz[2, 2] = label;
+                    if (i != matriz.GetLength(0) - 1)
+                    {
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        trace(26);
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                    }
                 }
             }
         }
-        static int verificaStatus(string[,] matriz)
+        static void mapaMatriz(int[,] mapa)
         {
-            int vencedor = 0;
-
-            if ((matriz[0, 0] == matriz[0, 1]) && (matriz[0, 1] == matriz[0, 2]))
+            Console.WriteLine(" ESCOLHA UM NÚMERO COM BASE NO MAPA A SEGUIR\n");
+            int cont = 1;
+            for (int i = 0; i < mapa.GetLength(0); i++)
             {
-                if (matriz[0, 0] == "X") vencedor = 1;
-                else vencedor = 2;
+                pad(8);
+                for (int c = 0; c < mapa.GetLength(1); c++)
+                {
+                    mapa[i, c] = cont;
+                    cont++;
+                    pad(1);
+                    Console.Write("[" + mapa[i, c] + "]");
+                    if (c != mapa.GetLength(1) - 1)
+                    {
+                        pad(1);
+                        Console.Write("|");
+                    }
+                }
+                if (i != mapa.GetLength(0) - 1)
+                {
+                    Console.WriteLine();
+                    pad(8);
+                    trace(17);
+                    Console.WriteLine();
+                }
             }
-
-            if ((matriz[1, 0] == matriz[1, 1]) && (matriz[1, 1] == matriz[1, 2]))
+        }
+        static void posicao(string[,] matriz, string jogador1, string jogador2, string dalt)
+        {
+            int pos = 0, cont = 0, parar = 0, linha, situacao;
+            string xo = "";
+            for (int l = 0; l < matriz.GetLength(0); l++)
             {
-                if (matriz[1, 0] == "X") vencedor = 1;
-                else vencedor = 2;
-            }
+                for (int c = 0; c < matriz.GetLength(1); c++)
+                {
+                    while (cont < 9)
+                    {
+                        if (cont % 2 == 0)
+                        {
+                            Console.Write($"\n=-=-=-=-Vez do {jogador1}-=-=-=-=-=");
+                            xo = "X";
+                            Console.Write($"\n\nDigite a posição desejada {jogador1}: ");
+                        }
+                        else
+                        {
+                            Console.Write($"\n=-=-=-=-Vez do {jogador2}-=-=-=-=-=");
+                            xo = "O";
+                            Console.Write($"\n\nDigite a posição desejada {jogador2}: ");
+                        }
+                        try
+                        {
+                            pos = int.Parse(Console.ReadLine());
+                        }
+                        catch (FormatException)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\nVOCÊ DEVE DIGITAR UM NÚMERO INTEIRO!!");
+                            Console.ResetColor();
+                            continue;
+                        }
+                        catch (OverflowException)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\nVOCÊ DEVE DIGITAR UM NÚMERO INTEIRO!!");
+                            Console.ResetColor();
+                            continue;
+                        }
 
-            if ((matriz[2, 0] == matriz[2, 1]) && (matriz[2, 1] == matriz[2, 2]))
-            {
-                if (matriz[2, 0] == "X") vencedor = 1;
-                else vencedor = 2;
-            }
+                        if (pos < 1 || pos > 9)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\nO NÚMERO DEVE SER DE 1 A 9!!");
+                            Console.ResetColor();
+                            continue;
+                        }
+                        linha = 0;
+                        if (pos >= 4 && pos < 7)
+                        {
+                            pos -= 3;
+                            linha = 1;
+                        }
 
-            if ((matriz[0, 0] == matriz[1, 0]) && (matriz[1, 0] == matriz[2, 0]))
-            {
-                if (matriz[0, 0] == "X") vencedor = 1;
-                else vencedor = 2;
-            }
+                        else if (pos >= 7 && pos < 10)
+                        {
+                            pos -= 6;
+                            linha = 2;
+                        }
 
-            if ((matriz[0, 1] == matriz[1, 1]) && (matriz[1, 1] == matriz[2, 1]))
-            {
-                if (matriz[0, 1] == "X") vencedor = 1;
-                else vencedor = 2;
-            }
+                        if (matriz[linha, pos - 1] == null)
+                        {
+                            matriz[linha, pos - 1] = xo;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\nPOSIÇÃO JÁ PREENCHIDA!!!");
+                            Console.ResetColor();
+                            continue;
+                        }
+                        cont++;
+                        Console.WriteLine();
+                        Imprimir_Jogo(matriz, dalt);
+                        Console.WriteLine();
+                        situacao = verificarSituacao(matriz);
 
-            if ((matriz[0, 2] == matriz[1, 2]) && (matriz[1, 2] == matriz[2, 2]))
-            {
-                if (matriz[0, 2] == "X") vencedor = 1;
-                else vencedor = 2;
+                        if (situacao == 1)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            Console.WriteLine($"\n{jogador1.ToUpper()} GANHOU!!");
+                            Console.ResetColor();
+                            return;
+                        }
+                        else if (situacao == 2)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine($"\n{jogador2.ToUpper()} GANHOU!!");
+                            Console.ResetColor();
+                            return;
+                        }
+                        else if (situacao == 0)
+                        {
+                            parar++;
+                            if (parar == 9)
+                            {
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
+                                Console.WriteLine("\nDEU VELHA!!!");
+                                Console.ResetColor();
+                            }
+                        }
+                    }
+                }
             }
+        }
+        static int verificarSituacao(string[,] matriz)
+        {
+            //linha 1
+            if ((matriz[0, 0] == matriz[0, 1] && matriz[0, 0] == matriz[0, 2]) && matriz[0, 0] != null)
+                if (matriz[0, 0] == "X") return 1;
+                else return 2;
 
-            if ((matriz[0, 0] == matriz[1, 1]) && (matriz[1, 1] == matriz[2, 2]))
-            {
-                if (matriz[0, 0] == "X") vencedor = 1;
-                else vencedor = 2;
-            }
+            //linha 2
+            else if ((matriz[1, 0] == matriz[1, 1] && matriz[1, 0] == matriz[1, 2]) && matriz[1, 0] != null)
+                if (matriz[1, 0] == "X") return 1;
+                else return 2;
 
-            if ((matriz[0, 2] == matriz[1, 1]) && (matriz[1, 1] == matriz[2, 0]))
+            //linha 3
+            else if ((matriz[2, 0] == matriz[2, 1] && matriz[2, 0] == matriz[2, 2]) && matriz[2, 0] != null)
+                if (matriz[2, 0] == "X") return 1;
+                else return 2;
+
+            //coluna 1
+            else if ((matriz[0, 0] == matriz[1, 0] && matriz[0, 0] == matriz[2, 0]) && matriz[2, 0] != null)
+                if (matriz[0, 0] == "X") return 1;
+                else return 2;
+
+            //coluna 2
+            else if ((matriz[0, 1] == matriz[1, 1] && matriz[0, 1] == matriz[2, 1]) && matriz[0, 1] != null)
+                if (matriz[0, 1] == "X") return 1;
+                else return 2;
+
+            //coluna 3
+            else if ((matriz[0, 2] == matriz[1, 2] && matriz[0, 2] == matriz[2, 2]) && matriz[0, 2] != null)
+                if (matriz[0, 2] == "X") return 1;
+                else return 2;
+
+            //diagonal 1
+            else if ((matriz[0, 0] == matriz[1, 1] && matriz[0, 0] == matriz[2, 2]) && matriz[2, 2] != null)
+                if (matriz[0, 0] == "X") return 1;
+                else return 2;
+
+            //diagonal 2
+            else if ((matriz[2, 0] == matriz[1, 1] && matriz[2, 0] == matriz[0, 2]) && matriz[0, 2] != null)
+                if (matriz[2, 0] == "X") return 1;
+                else return 2;
+
+            else return 0;
+        }
+        static void pad(int tam)
+        {
+            for (int i = 0; i < tam; i++)
             {
-                if (matriz[0, 2] == "X") vencedor = 1;
-                else vencedor = 2;
+                Console.Write(" ");
             }
-            return vencedor;
+        }
+        static void trace(int qtd)
+        {
+            for (int i = 0; i < qtd; i++)
+            {
+                Console.Write("-");
+            }
         }
     }
 }
