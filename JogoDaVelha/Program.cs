@@ -148,7 +148,7 @@ namespace JogoDaVelhaFinal
                 }
             }
         }
-        static void MapaMatriz(int[,] mapa)                                             //Função para imprimri Mapado Jogo
+        static void MapaMatriz(int[,] mapa)                                             //Função para imprimir Mapa do Jogo
         {
             Console.WriteLine(" ESCOLHA UM NÚMERO COM BASE NO MAPA A SEGUIR\n");
             int cont = 1;
